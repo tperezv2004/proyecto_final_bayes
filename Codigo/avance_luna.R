@@ -12,7 +12,7 @@ library(rstanarm)
 library(loo)
 
 
-ruta_datos <- "Data/reporte_USA.csv"
+ruta_datos <- "../Data/reporte_USA.csv"
 df_trabajo <- read_csv(ruta_datos)
 
 #leer cols 

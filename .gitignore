@@ -5,3 +5,6 @@ Data/
 .RData
 .Rhistory
 .Rproj.user/
+
+Codigo/.RDataTmp
+Codigo/.Rhistory

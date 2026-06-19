@@ -7,6 +7,7 @@
 library(tidyverse)
 library(lubridate)
 library(skimr)
+install.packages("pROC")
 
 
 # --------------------------------------------------------
@@ -15,7 +16,7 @@ library(skimr)
 # --------------------------------------------------------
 # --------------------------------------------------------
 
-ruta_datos <- "Data/completos.csv"
+ruta_datos <- "../Data/completos.csv"
 
 df <- read_csv(ruta_datos)
 
