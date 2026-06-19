@@ -13,6 +13,7 @@ library(bayesplot)
 library(bayestestR)
 library(loo)
 library(VIM)
+library(pROC)
 
 options(mc.cores = parallel::detectCores()) # no tocar
 
@@ -643,7 +644,7 @@ plot(modelo_final, "acf_bar")
 # 21. CURVA ROC Y AUC
 # --------------------------------------------------------
 # --------------------------------------------------------
-library(pROC)
+
 pred_post_obs <- posterior_epred(
   modelo_final,
   newdata = df_modelo
