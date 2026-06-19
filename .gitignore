@@ -1,0 +1,7 @@
+# Datos
+Data/
+
+# Archivos de R
+.RData
+.Rhistory
+.Rproj.user/
