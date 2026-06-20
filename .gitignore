@@ -8,3 +8,15 @@ Data/
 
 Codigo/.RDataTmp
 Codigo/.Rhistory
+
+.DS_Store
+
+# Archivos generados por LaTeX
+*.aux
+*.log
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.out
+*.gz
+texput.log
