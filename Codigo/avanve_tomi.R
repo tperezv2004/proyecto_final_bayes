@@ -88,6 +88,13 @@ df_trabajo %>%
 umbral_elite <- quantile(df_trabajo$Dots, 0.80, na.rm = TRUE)
 
 df_modelo_pre <- df_trabajo %>%
+  # Quite las columans que la porfe dijo que no eran muy utiles
+  select(-c(
+    BirthYearClass, Squat1Kg, Squat2Kg, Squat3Kg, Squat4Kg, 
+    Bench1Kg, Bench2Kg, Bench3Kg, Bench4Kg,Deadlift1Kg, Deadlift2Kg, 
+    Deadlift4Kg, Best3SquatKg, Best3BenchKg, Place, ParentFederation,
+    MeetCountry, MeetState, MeetName, WeightClassKg, State, Deadlift3Kg
+  )) %>%
   mutate(
     Date = as.Date(Date),
     Year = year(Date),
@@ -122,6 +129,7 @@ df_modelo_pre <- df_trabajo %>%
   )
 
 dim(df_modelo_pre)
+colnames(df_modelo_pre)
 
 
 # --------------------------------------------------------

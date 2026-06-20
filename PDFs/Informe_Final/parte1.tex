@@ -44,62 +44,69 @@
 \end{titlepage}
 
 \section*{Resumen}
-% Aquí va un resumen de aprox. 250 palabras con: contexto, objetivos, método, resultados y conclusiones.
+En siguiente informe se presentaran los resultados del análisis de datos de Powerlifting con el objetivo de identificar los factores predictivos para que un 
+alteta alcance un rendimiento de elite. Durante el proceso de investigación y trabajo se utilizo un Modelo de Regresión Logística Bayesiana para analizar las 
+variables y su relación con el rendimiento elite, definiendo un puntaje elite a partir de un percentil de los puntajes Dots de los atletas. 
 
+La principal pregunta a responder a través de este informe es ¿Cuales caracteristicas del atleta actuan como factores predictivos para alcanzar el nivel de elite en USA?
+Al intentar responder esta pregunata surguieron otras, como si el sexo del atleta afecta la probabilidad de alcanzar el nivel elite, o si el tipo de equipamiento utilizado 
+en la competencia tiene alguna influencia en el rendimiento elite
 \section{Introducción}
-% Contextualiza el trabajo, plantea objetivos y presenta brevemente el método.
+% hay que expliacar que es el powerlifting, que es el rendimiento elite, y por que es importante estudiar los factores predictivos del rendimiento elite en este deporte.
 
 \section{Análisis}
 
 \subsection{Descripción de variables y datos}
-% Describe resultados con tablas/figuras, errores y observaciones preliminares. 
+% Hay que expliacr pq la desicion de X puntaje para elite, que se estandarizaron algunas columans 
+% que se eliminaron otras y que se crearon otras a partir de las originales, como el año de la competencia a partir de la fecha, etc. 
 
-
+\textbf{faltan las variables que se estandarizaron y creo que las comunas "creadas"}
 \begin{longtable}{lp{8cm}ll}
 \caption{Diccionario de Variables Seleccionadas de OpenPowerlifting}
 \label{tab:variables_opl_filtradas} \\
 \toprule
-Variable & Descripcion & Tipo & Unidad \\
+Variable & Descripcion & Tipo & Escala/Unidad \\
 \midrule
 \endfirsthead
 
 \multicolumn{4}{c}{{\bfseries Continuación de la tabla anterior}} \\
 \toprule
-Variable & Descripcion & Tipo & Unidad \\
+Variable & Descripcion & Tipo & Escala/Unidad \\
 \midrule
 \endhead
 
 \midrule
-\multicolumn{4}{r}{{Continúa en la siguiente página...}} \\
+\multicolumn{4}{r}{{}} \\
 \endfoot
 
 \bottomrule
 \endlastfoot
 
-Name & El nombre del levantador[cite: 4]. Puede repetirse si compitió más de una vez. & Cualitativa & No aplica \\
-Sex & La categoría de sexo en la que compitió el levantador[cite: 6]. & Cualitativa & No aplica \\
-Age & La edad del levantador en la fecha de inicio del encuentro[cite: 19]. & Cuantitativa & años \\
-AgeClass & La clase de edad en la que se clasifica el levantador[cite: 27]. & Cualitativa & Rango de edad \\
-BodyweightKg & El peso corporal registrado del levantador en el momento de la competencia[cite: 41]. & Cuantitativa & Kg \\
-Event & El tipo de competencia en la que participó el levantador[cite: 9]. & Cualitativa & No aplica \\
-Equipment & La categoría de equipamiento bajo la cual se realizaron los levantamientos[cite: 12]. & Cualitativa & No aplica \\
-Division & Texto libre UTF-8 que describe la división de competencia[cite: 37]. & Cualitativa & No aplica \\
-Tested & ``Yes'' si el levantador ingresó a una categoría con prueba de drogas[cite: 79]. & Cualitativa & No aplica \\
-Best3DeadliftKg & Máximo de los primeros tres intentos exitosos para el peso muerto[cite: 55]. & Cuantitativa & Kg \\
-TotalKg & Suma de los mejores levantamientos si los tres fueron un éxito[cite: 57]. & Cuantitativa & Kg \\
-Dots & Un número positivo si se pudieron calcular los puntos Dots[cite: 65]. & Cuantitativa & Puntos \\
-Wilks & Un número positivo si se pudieron calcular los puntos Wilks[cite: 69]. & Cuantitativa & Puntos \\
-Goodlift & Un número positivo si se pudieron calcular los puntos IPF GL[cite: 75]. & Cuantitativa & Puntos \\
-Country & El país de origen del levantador, si se conoce[cite: 82]. & Cualitativa & No aplica \\
-Federation & La federación que organizó el encuentro[cite: 85]. & Cualitativa & No aplica \\
-Date & La fecha de inicio del encuentro en formato ISO 8601[cite: 91]. & Fecha & Fecha \\
-Sanctioned & Indica si el encuentro cuenta como oficialmente sancionado[cite: 99]. & Cualitativa & No aplica \\
-Elite & Variable creada para clasificar atletas con Dots $\geq$ 400 como Elite. & Cualitativa & No aplica \\
+Name & El nombre del levantador. Puede repetirse si compitió más de una vez. & Cualitativa & No aplica \\
+Sex & La categoría de sexo en la que compitió el levantador. & Cualitativa & No aplica \\
+Age & La edad del levantador en la fecha de inicio del encuentro. & Cuantitativa & años \\
+AgeClass & La clase de edad en la que se clasifica el levantador. & Cualitativa & Rango de edad \\
+BodyweightKg & El peso corporal registrado del levantador en el momento de la competencia. & Cuantitativa & Kg \\
+Event & El tipo de competencia en la que participó el levantador. & Cualitativa & No aplica \\
+Equipment & La categoría de equipamiento bajo la cual se realizaron los levantamientos. & Cualitativa & No aplica \\
+Tested & ``Yes'' si el levantador ingresó a una categoría con prueba de drogas. & Cualitativa & No aplica \\
+TotalKg & Suma de los mejores levantamientos si los tres fueron un éxito & Cuantitativa & Kg \\
+Dots & Un número positivo si se pudieron calcular los puntos Dots. & Cuantitativa & Puntos \\
+Wilks & Un número positivo si se pudieron calcular los puntos Wilks. & Cuantitativa & Puntos \\
+Country & El país de origen del levantador, si se conoce. & Cualitativa & No aplica \\
+Federation & La federación que organizó el encuentro. & Cualitativa & No aplica \\
+Date & La fecha de inicio del encuentro en formato ISO 8601. & Fecha & Fecha \\
+Sanctioned & Indica si el encuentro cuenta como oficialmente sancionado. & Cualitativa & No aplica \\
+Elite & Variable creada para clasificar atletas con Dots $\geq$ 400 como Elite. \textbf{Hay que estandarizar este 
+valor en los codigos, ya que no son la misma, para que el analisis tenga sentido} & Cualitativa & No aplica \\
 Equipo & Variable creada para agrupar Raw versus Equipado. & Cualitativa & No aplica \\
 Sexo & Variable equivalente a Sex, adaptada al español. & Cualitativa & No aplica \\
 Year & Año de la competencia, creado a partir de Date. & Cuantitativa discreta & año \\
 
 \end{longtable}
+
+\textbf{(hay columnas que igual son puntajes, hay que explicar en el informe que se quitaron, ya que si se utilizaban 
+se estaría utilizando información que se obtiene a partir de la variable objetivo, lo que no es correcto)}
 
 \subsection{Análisis preliminar} (aqui yo pondria los graficos antes del modelar) 
 % Otro bloque de resultados
