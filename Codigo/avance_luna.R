@@ -54,7 +54,7 @@ df_1 <- df_trabajo %>%
   filter(Sex %in% c("M", "F")) %>%
   select(-c(
     BirthYearClass, Squat1Kg, Squat2Kg, Squat3Kg, Squat4Kg, 
-    Bench1Kg, Bench2Kg, Bench3Kg, Deadlift1Kg, Deadlift2Kg, 
+    Bench1Kg, Bench2Kg, Bench3Kg, Bench4Kg,Deadlift1Kg, Deadlift2Kg, 
     Deadlift4Kg, Best3SquatKg, Best3BenchKg, Place, ParentFederation,
     MeetCountry, MeetState, MeetName, WeightClassKg, State, Deadlift3Kg
   )) %>%
@@ -71,9 +71,12 @@ df_plot_barras <- df_1 %>%
   summarise(Promedio_Dots = mean(Dots), .groups = "drop")%>%
   mutate(Sexo = factor(Sexo, levels = c(0, 1), labels = c("Hombres", "Mujeres")))
 
-ggplot(df_plot_barras, aes(x = Age, y = Promedio_Dots, fill = Equipo)) +
-  geom_col(aes(color = Equipo), alpha = 1, width = 1) +
+ggplot(df_plot_barras, aes(x = Age, y = Promedio_Dots, fill = Sexo)) +
+  geom_col(alpha = 1, width = 1) +
   scale_x_continuous(breaks = seq(15, 100, by = 5)) +
+  scale_fill_manual(
+    values = c("Mujeres" = "#FF6EB4", "Hombres" = "#87CEFA")  
+  ) +
   facet_grid(Sexo ~ Equipo) +
   theme_minimal() +
   labs(
@@ -90,10 +93,19 @@ ggplot(df_plot_barras, aes(x = Age, y = Promedio_Dots, fill = Equipo)) +
     legend.position = "none",
     panel.grid.major.x = element_blank()
   )
-
 summary(df_1)
 colSums(is.na(df_1))
 colnames(df_1)
+
+ggplot(df_trabajo, aes(x = Dots, fill = Sex)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(
+    values = c("F" = "#FF6EB4", "M" = "#87CEFA")
+  ) +
+  labs(title = "Distribución de Puntaje DOTS por Sexo",
+       x = "Puntaje DOTS")
+
+
 # 
 aggr(df_1, numbers = TRUE, prop = FALSE)
 

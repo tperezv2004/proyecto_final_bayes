@@ -69,11 +69,11 @@ df_trabajo %>%
 
 # --------------------------------------------------------
 # --------------------------------------------------------
-# 5. PREPARAR DATOS PARA LA PREGUNTA 4
+# 5. PREPARAR DATOS PARA LA PREGUNTA 
 # --------------------------------------------------------
 # --------------------------------------------------------
 
-# Pregunta 4:
+# Pregunta
 # Cuales caracteristicas del atleta actuan como factores predictivos
 # para alcanzar el nivel de elite en USA?
 
@@ -146,6 +146,7 @@ df_modelo_pre %>%
     porcentaje_elite = mean(Elite) * 100
   )
 
+names(df_modelo_pre)
 
 # --------------------------------------------------------
 # --------------------------------------------------------
@@ -209,10 +210,13 @@ df_plot_elite <- df_modelo %>%
 
 grafico_elite_edad <- ggplot(
   df_plot_elite,
-  aes(x = RangoEdad, y = Porcentaje_Elite, fill = Equipo)
+  aes(x = RangoEdad, y = Porcentaje_Elite, fill = Sex)  
 ) +
-  geom_col(position = "dodge") +
-  facet_grid(Sex ~ Equipo) +
+  geom_col() + 
+  facet_grid(Sex ~ Equipo, scales = "free_x") + 
+  scale_fill_manual(
+    values = c("F" = "#FF6EB4", "M" = "#87CEFA")  
+  ) +
   labs(
     title = "Porcentaje de atletas Elite por edad",
     subtitle = "Clasificacion Elite definida como el 20% superior de DOTS",
@@ -224,7 +228,7 @@ grafico_elite_edad <- ggplot(
     plot.title = element_text(face = "bold", size = 16),
     plot.subtitle = element_text(size = 12),
     strip.text = element_text(face = "bold"),
-    axis.text.x = element_text(angle = 80, vjust = 0.5, hjust = 1),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 7),
     legend.position = "none"
   )
 
@@ -308,7 +312,7 @@ modelo_2 <- stan_glm(
 
 
 # Modelo 3:
-# Variables fisicas + sexo + tipo de equipo + testeo + anho.
+# Variables fisicas + sexo + tipo de equipo + testeo + año.
 
 modelo_3 <- stan_glm(
   Elite ~ Age_std + I(Age_std^2) + Bw_std + Sex + Equipo + Tested_bin + Year_std,
