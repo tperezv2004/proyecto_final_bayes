@@ -87,3 +87,14 @@ Data/reporte_USA.csv
 ```
 
 Este archivo corresponde a la base de datos filtrada para Estados Unidos, que es la que se utiliza en el análisis del proyecto.
+
+## Falta 
+1. Agregar BF, ya que solo tenemos LOO y la profe dijo que debiamos agregarlo (intrepretar y "comparar" ambos)
+
+2. Revisar ortografí y code 
+
+3. Organizar code 
+
+4. Analisas graficos y resultados
+
+
