@@ -93,7 +93,8 @@ df_modelo_pre <- df_trabajo %>%
     BirthYearClass, Squat1Kg, Squat2Kg, Squat3Kg, Squat4Kg, 
     Bench1Kg, Bench2Kg, Bench3Kg, Bench4Kg,Deadlift1Kg, Deadlift2Kg, 
     Deadlift4Kg, Best3SquatKg, Best3BenchKg, Place, ParentFederation,
-    MeetCountry, MeetState, MeetName, WeightClassKg, State, Deadlift3Kg
+    MeetCountry, MeetState, MeetName, WeightClassKg, State, Deadlift3Kg,
+    Division, Goodlift, Best3DeadliftKg
   )) %>%
   mutate(
     Date = as.Date(Date),
@@ -226,7 +227,7 @@ grafico_elite_edad <- ggplot(
     values = c("F" = "#FF6EB4", "M" = "#87CEFA")  
   ) +
   labs(
-    title = "Porcentaje de atletas Elite por edad",
+    title = "Porcentaje de atletas Elite por edad y sexo",
     subtitle = "Clasificacion Elite definida como el 20% superior de DOTS",
     x = "Rango de edad",
     y = "Porcentaje Elite"
