@@ -88,6 +88,13 @@ Data/reporte_USA.csv
 
 Este archivo corresponde a la base de datos filtrada para Estados Unidos, que es la que se utiliza en el análisis del proyecto.
 
+Agregue un script para dejar el script final mas ordenado, con el procesamiento de los datos aparte. Si se ejecuta 
+
+```text
+Codigo/data_modelos_finales.R
+```
+se crea un nuevo archivo llamado `Data/modelos_finales.csv`, no se esta usando en nada por ahora, pero mi idea es que quede como un archivo con los datos ya procesados para los modelos, y asi el script del modelo quede mas ordenado y limpio.
+
 ## Falta 
 1. Agregar BF, ya que solo tenemos LOO y la profe dijo que debiamos agregarlo (intrepretar y "comparar" ambos)
 
