@@ -243,6 +243,170 @@ grafico_elite_edad <- ggplot(
 
 grafico_elite_edad
 
+df_plot_elite <- df_modelo %>%
+  mutate(
+    RangoEdad = cut(
+      Age,
+      breaks = seq(15, 85, by = 5), 
+      right = FALSE
+    ),
+    Sexo_Label = if_else(Sex == "M", "Hombre", "Mujer")
+  ) %>%
+  group_by(RangoEdad, Sexo_Label, Equipo) %>%
+  summarise(
+    n = n(),
+    Porcentaje_Elite = mean(Elite) * 100,
+    .groups = "drop"
+  ) %>%
+  filter(n >= 20)
+
+grafico_elite_edad_2 <- ggplot(
+  df_plot_elite,
+  aes(x = RangoEdad, y = Porcentaje_Elite, fill = Sexo_Label)  
+) +
+  geom_col(position = position_dodge(width = 0.9)) + 
+  facet_wrap(~ Equipo) + 
+  scale_fill_manual(
+    name = "Sexo",
+    values = c("Hombre" = "#63B8FF", "Mujer" = "#FF6EB4")  
+  ) +
+  labs(
+    title = "Porcentaje de atletas Elite por edad, sin separar subgrupos",
+    subtitle = "Elite = Percentil 95 en DOTS | Sexo como predictor en el modelo",
+    x = "Rango de edad",
+    y = "Porcentaje Elite"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12),
+    strip.text = element_text(face = "bold", size = 12),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 9),
+    legend.position = "bottom", 
+    legend.title = element_text(face = "bold")
+  )
+grafico_elite_edad_2
+
+# --------------------------------------------------------
+# GRAFICO DESCRIPTIVO: DENSIDAD DE PESO CORPORAL
+# --------------------------------------------------------
+
+grafico_peso_elite <- ggplot(
+  df_modelo,
+  aes(x = BodyweightKg, fill = Elite_texto)
+) +
+  geom_density(alpha = 0.6, color = "white") + 
+  # se lo sacamos se ve la dencidad "completa" 
+  facet_wrap(
+    ~ Sex, 
+    labeller = as_labeller(c("F" = "Mujeres", "M" = "Hombres"))
+  ) +
+  scale_fill_manual(
+    name = "Nivel del Atleta",
+    values = c("Elite" = "#FFC125", "No elite" = "#A2B5CD") 
+  ) +
+  labs(
+    title = "Distribución del peso corporal según nivel del atleta",
+    subtitle = "Comparación de densidad entre atletas Elite y No Elite",
+    x = "Peso Corporal (kg)",
+    y = "Densidad"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12),
+    strip.text = element_text(face = "bold", size = 12),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold")
+  )
+grafico_peso_elite
+
+# GRAFICO DESCRIPTIVO: EVOLUCION TEMPORAL (YEAR)
+df_plot_year <- df_modelo %>%
+  group_by(Year, Equipo) %>% 
+  summarise(
+    n = n(),
+    Porcentaje_Elite = mean(Elite) * 100,
+    .groups = "drop"
+  ) %>%
+  filter(n >= 20) 
+
+grafico_tendencia_year <- ggplot(
+  df_plot_year,
+  aes(x = Year, y = Porcentaje_Elite, color = Equipo, group = Equipo)
+) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 3) +
+  scale_color_manual(
+    name = "Equipamiento",
+    values = c("Raw" = "#4CAF50", "Equipado" = "#FF9800")
+  ) +
+  scale_x_continuous(breaks = seq(min(df_plot_year$Year), max(df_plot_year$Year), by = 2)) +
+  labs(
+    title = "Evolución de atletas Elite a lo largo del tiempo",
+    subtitle = "Porcentaje de clasificación Elite por año y tipo de equipamiento",
+    x = "Año de competencia",
+    y = "Porcentaje Elite"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold")
+  )
+grafico_tendencia_year
+
+# --------------------------------------------------------
+# GRAFICO DESCRIPTIVO: CONTROL ANTIDOPAJE (TESTED)
+# --------------------------------------------------------
+
+df_plot_tested <- df_modelo %>%
+  mutate(
+    Control_Dopaje = if_else(Tested_bin == 1, "Con testeo antidopaje", "Sin testeo (o no reportado)")
+  ) %>%
+  group_by(Equipo, Control_Dopaje) %>% 
+  summarise(
+    n = n(),
+    Porcentaje_Elite = mean(Elite) * 100,
+    .groups = "drop"
+  ) %>%
+  filter(n >= 20)
+
+grafico_dopaje <- ggplot(
+  df_plot_tested,
+  aes(x = Equipo, y = Porcentaje_Elite, fill = Control_Dopaje)
+) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  geom_text(
+    aes(label = paste0(round(Porcentaje_Elite, 1), "%")),
+    position = position_dodge(width = 0.7),
+    vjust = -0.8,
+    size = 4,
+    fontface = "bold",
+    color = "black"
+  ) +
+  scale_fill_manual(
+    name = "Estatus de la Competencia",
+    values = c("Con testeo antidopaje" = "#5DADE2", "Sin testeo (o no reportado)" = "#E74C3C")
+  ) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title = "Proporción de atletas Elite según control antidopaje",
+    subtitle = "Comparación entre competencias testeadas y no testeadas por equipamiento",
+    x = "Tipo de Equipamiento",
+    y = "Porcentaje Elite"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12),
+    axis.text.x = element_text(face = "bold", size = 12),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold")
+  )
+grafico_dopaje
 
 # --------------------------------------------------------
 # --------------------------------------------------------

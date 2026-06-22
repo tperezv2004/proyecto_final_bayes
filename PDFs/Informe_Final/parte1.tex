@@ -48,20 +48,49 @@ En siguiente informe se presentaran los resultados del análisis de datos de Pow
 alteta alcance un rendimiento de elite. Durante el proceso de investigación y trabajo se utilizo un Modelo de Regresión Logística Bayesiana para analizar las 
 variables y su relación con el rendimiento elite, definiendo un puntaje elite a partir de un percentil de los puntajes Dots de los atletas. 
 
-La principal pregunta a responder a través de este informe es ¿Cuales caracteristicas del atleta actuan como factores predictivos para alcanzar el nivel de elite en USA?
+La principal pregunta a responder a través de este informe es \textbf{¿Cuales caracteristicas del atleta actuan como factores predictivos para alcanzar el nivel de elite en USA?}
 Al intentar responder esta pregunata surguieron otras, como si el sexo del atleta afecta la probabilidad de alcanzar el nivel elite, o si el tipo de equipamiento utilizado 
 en la competencia tiene alguna influencia en el rendimiento elite. 
 
-\section{Introducción}
+\section*{Introducción}
 % hay que expliacar que es el powerlifting, que es el rendimiento elite, y por que es importante estudiar los factores predictivos del rendimiento elite en este deporte.
+El powerlifting es un deporte de fuerza que consiste en levatamiento de peso principalmente en tres modalidades, sentadilla, press de banca y peso muerto, donde se 
+busca la Repetición Máxima o 1RM, es decir levantar el máximo peso posible en el primer intento. Al tratarse de un deporte de fuerza el rendimiento de los atletas de ve 
+fuertemente influenciado por factores físicos como el peso corporal, por esta razón existen diversos sistemas de puntuación que estandarizan el rendimiento de cada atleta
+segun estos. Para este informe nos centraremos en el sistema de puntución Dots (Dynamic Objective Team Scoring), no se abordara ni las formulas de como este se calcula, ni 
+otros sistemas de puntuación, ya que no son relevantes para el objetivo de este informe, que es identificar los factores predictivos del rendimiento elite, 
+definido como el percentil $95\%$ puntajes Dots (top $5\%$ de los atletas). 
 
-\section{Análisis}
+Para modelar el rendimiento elite se utilizo un modelo de regresión logistica con enfoque bayesiano, ya que utiliza un enfoque más probabilístico de que ocurra un evento 
+con dos estados posibles, en este caso alcanzar o no el rendimiento elite. 
 
-\subsection{Descripción de variables y datos}
+
+\section*{Análisis}
+
+\subsection*{Descripción de variables y datos}
+
+Los datos utilizados para estimar los modelos provienen de \textbf{OpenPowerlifting}, una base abierta que recopila resultados de competencias de powerlifting a nivel internacional. 
+La base original contiene 3.920.662 registros y 42 variables, pero para este análisis fuerón selccionadas $\sim 16$ variables que están señaladas mas adelante, es importante señalar 
+que las filas no son completamente independientes, ya que un mismo atleta puede aparecer varias veces si compitió en más de una ocasión.
+
+
+La preparación y tratamiento de los datos estan detallas de mejor manera en el informe anterior, pero a modo de resumen, antes de modelar 
+los datos se descartaron variables que no eran relevantes y se crearon nuevas variables a partir de las originales, como lo son
+
+\begin{itemize}
+    \item \textbf{Elite}: Variable binaria creada para clasificar atletas como Elite (1) si sus puntos \textit{Dots} son $\geq$ al percentil 80 de la muestra, o No Elite (0) en caso contrario.
+    \item \textbf{Elite\_texto}: Variable categórica de texto (``Elite'' o ``No elite'') derivada de la variable anterior, utilizada principalmente para simplificar la segmentación en los análisis de frecuencias y representaciones gráficas.
+    \item \textbf{Equipo}: Variable cualitativa creada para condensar la columna original \textit{Equipment} en únicamente dos niveles comparables: ``Raw'' y ``Equipado'' (esta última agrupa las modalidades de soporte \textit{Wraps}, \textit{Single-ply} y \textit{Multi-ply}).
+    \item \textbf{Tested\_bin}: Indicadora binaria que simplifica la condición de control antidopaje, asignando un valor de 1 si el atleta compitió bajo una categoría testeada (``Yes'') y 0 si no se realizó la prueba o el dato figuraba como ausente.
+    \item \textbf{Year}: Variable cuantitativa discreta que extrae el año exacto de la competencia a partir de la columna original de tipo fecha (\textit{Date}).
+    \item \textbf{Age\_std, Bw\_std y Year\_std}: Variables numéricas continuas (edad, peso corporal y año de competencia, respectivamente) transformadas mediante un proceso de estandarización lineal ($Z$-score). Esta conversión centra las medias en 0 y fija la desviación estándar en 1, una práctica fundamental en el modelado bayesiano para acelerar la convergencia de los algoritmos de muestreo MCMC y permitir la correcta influencia de las distribuciones \textit{prior}.
+\end{itemize}
+
+Se eliminaron observaciones con valores faltantes en variables utilizadas para modelar y se restringierón valores atípicos en edades, pesos corporales, etc. Quedando con las suguientes 
+variables para el análisis
+
 % Hay que expliacr pq la desicion de X puntaje para elite, que se estandarizaron algunas columans 
 % que se eliminaron otras y que se crearon otras a partir de las originales, como el año de la competencia a partir de la fecha, etc. 
-
-\textbf{faltan las variables que se estandarizaron y creo que las comunas "creadas"}
 \begin{longtable}{lp{8cm}ll}
 \caption{Diccionario de Variables Seleccionadas de OpenPowerlifting}
 \label{tab:variables_opl_filtradas} \\
@@ -83,7 +112,6 @@ Variable & Descripcion & Tipo & Escala/Unidad \\
 \bottomrule
 \endlastfoot
 
-Name & El nombre del levantador. Puede repetirse si compitió más de una vez. & Cualitativa & No aplica \\
 Sex & La categoría de sexo en la que compitió el levantador. & Cualitativa & No aplica \\
 Age & La edad del levantador en la fecha de inicio del encuentro. & Cuantitativa & años \\
 AgeClass & La clase de edad en la que se clasifica el levantador. & Cualitativa & Rango de edad \\
@@ -93,21 +121,19 @@ Equipment & La categoría de equipamiento bajo la cual se realizaron los levanta
 Tested & ``Yes'' si el levantador ingresó a una categoría con prueba de drogas. & Cualitativa & No aplica \\
 TotalKg & Suma de los mejores levantamientos si los tres fueron un éxito & Cuantitativa & Kg \\
 Dots & Un número positivo si se pudieron calcular los puntos Dots. & Cuantitativa & Puntos \\
-Wilks & Un número positivo si se pudieron calcular los puntos Wilks. & Cuantitativa & Puntos \\
-Country & El país de origen del levantador, si se conoce. & Cualitativa & No aplica \\
-Federation & La federación que organizó el encuentro. & Cualitativa & No aplica \\
 Date & La fecha de inicio del encuentro en formato ISO 8601. & Fecha & Fecha \\
 Sanctioned & Indica si el encuentro cuenta como oficialmente sancionado. & Cualitativa & No aplica \\
-Elite & Variable creada para clasificar atletas con Dots $\geq$ 400 como Elite. \textbf{Hay que estandarizar este 
-valor en los codigos, ya que no son la misma, para que el analisis tenga sentido} & Cualitativa & No aplica \\
-Equipo & Variable creada para agrupar Raw versus Equipado. & Cualitativa & No aplica \\
+Elite & Variable binaria creada para clasificar atletas como Elite (1) si sus puntos Dots son $\geq$ al percentil 95 de la muestra, o No Elite (0) en caso contrario. & Cualitativa & Binaria (1/0) \\
+Elite\_texto & Etiqueta en formato texto de la clasificación Elite (``Elite'' o ``No elite''). & Cualitativa & No aplica \\
+Equipo & Variable creada para agrupar las categorías de equipamiento en ``Raw'' y ``Equipado''. & Cualitativa & No aplica \\
+Tested\_bin & Variable binaria que indica si el atleta fue sometido a control antidopaje (1 = Yes) o no (0 = No/NA). & Cualitativa & Binaria (1/0) \\
 Sexo & Variable equivalente a Sex, adaptada al español. & Cualitativa & No aplica \\
-Year & Año de la competencia, creado a partir de Date. & Cuantitativa discreta & año \\
+Year & Año de la competencia, extraído a partir de Date. & Cuantitativa discreta & Año \\
+Age\_std & Edad del atleta estandarizada (Z-score) para el modelamiento bayesiano. & Cuantitativa continua & Desviaciones estándar \\
+Bw\_std & Peso corporal del atleta estandarizado (Z-score) para el modelamiento bayesiano. & Cuantitativa continua & Desviaciones estándar \\
+Year\_std & Año de la competencia estandarizado (Z-score) para el modelamiento bayesiano. & Cuantitativa continua & Desviaciones estándar \\
 
 \end{longtable}
-
-\textbf{(hay columnas que igual son puntajes, hay que explicar en el informe que se quitaron, ya que si se utilizaban 
-se estaría utilizando información que se obtiene a partir de la variable objetivo, lo que no es correcto)}
 
 \subsection{Análisis preliminar} (aqui yo pondria los graficos antes del modelar) 
 % Otro bloque de resultados
@@ -130,6 +156,8 @@ se estaría utilizando información que se obtiene a partir de la variable objet
 
 \section*{Referencias}
 BayesianN. 2023, ``Modeling Car Insurance Claim using Bayesian Logistic : Part 1'', RPubs. Disponible en: \texttt{https://rpubs.com/BayesianN/claims}
+
+A Short Intro to Bayesian Logistic Regression \texttt{https://medium.com/@wtc2189/day-6-a-short-intro-to-bayesian-logistic-regression-6141c1d1d6c9}
 % Formato: Apellido, Iniciales. Año, Revista, volumen, página.
 % Ejemplo: Aguirre, J. E., Ginsburg, A. G., Dunham, M. K., et al. 2011, ApJS, 192, 4
 
