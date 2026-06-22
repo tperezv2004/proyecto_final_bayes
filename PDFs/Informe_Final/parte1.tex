@@ -64,6 +64,7 @@ definido como el percentil $95\%$ puntajes Dots (top $5\%$ de los atletas).
 Para modelar el rendimiento elite se utilizo un modelo de regresión logistica con enfoque bayesiano, ya que utiliza un enfoque más probabilístico de que ocurra un evento 
 con dos estados posibles, en este caso alcanzar o no el rendimiento elite. 
 
+FALTA EXPLICAR COMO SE ELIGIO EL MODELO FINAL, SOLO MENCIONAR LAS TECNICAS UTILIZADAS Y PQ :) 
 
 \section*{Análisis}
 
@@ -78,12 +79,12 @@ La preparación y tratamiento de los datos estan detallas de mejor manera en el 
 los datos se descartaron variables que no eran relevantes y se crearon nuevas variables a partir de las originales, como lo son
 
 \begin{itemize}
-    \item \textbf{Elite}: Variable binaria creada para clasificar atletas como Elite (1) si sus puntos \textit{Dots} son $\geq$ al percentil 80 de la muestra, o No Elite (0) en caso contrario.
+    \item \textbf{Elite}: Variable binaria creada para clasificar atletas como Elite (1) si sus puntos \textit{Dots} son $\geq$ al percentil 95 de la muestra, o No Elite (0) en caso contrario.
     \item \textbf{Elite\_texto}: Variable categórica de texto (``Elite'' o ``No elite'') derivada de la variable anterior, utilizada principalmente para simplificar la segmentación en los análisis de frecuencias y representaciones gráficas.
     \item \textbf{Equipo}: Variable cualitativa creada para condensar la columna original \textit{Equipment} en únicamente dos niveles comparables: ``Raw'' y ``Equipado'' (esta última agrupa las modalidades de soporte \textit{Wraps}, \textit{Single-ply} y \textit{Multi-ply}).
     \item \textbf{Tested\_bin}: Indicadora binaria que simplifica la condición de control antidopaje, asignando un valor de 1 si el atleta compitió bajo una categoría testeada (``Yes'') y 0 si no se realizó la prueba o el dato figuraba como ausente.
     \item \textbf{Year}: Variable cuantitativa discreta que extrae el año exacto de la competencia a partir de la columna original de tipo fecha (\textit{Date}).
-    \item \textbf{Age\_std, Bw\_std y Year\_std}: Variables numéricas continuas (edad, peso corporal y año de competencia, respectivamente) transformadas mediante un proceso de estandarización lineal ($Z$-score). Esta conversión centra las medias en 0 y fija la desviación estándar en 1, una práctica fundamental en el modelado bayesiano para acelerar la convergencia de los algoritmos de muestreo MCMC y permitir la correcta influencia de las distribuciones \textit{prior}.
+    \item \textbf{Age\_std, Bw\_std y Year\_std}: Variables numéricas continuas (edad, peso corporal y año de competencia, respectivamente) transformadas mediante un proceso de estandarización lineal ($Z$-score). Esta conversión centra las medias en 0 y fija la desviación estándar en 1. 
 \end{itemize}
 
 Se eliminaron observaciones con valores faltantes en variables utilizadas para modelar y se restringierón valores atípicos en edades, pesos corporales, etc. Quedando con las suguientes 
@@ -138,7 +139,56 @@ Year\_std & Año de la competencia estandarizado (Z-score) para el modelamiento 
 \subsection{Análisis preliminar} (aqui yo pondria los graficos antes del modelar) 
 % Otro bloque de resultados
 
-\subsection{Modelo preliminar}
+\subsection*{Modelo preliminar}
+
+La variable a modelar es \textbf{Elite}, que es una variable binaria, por lo que utilizar un modelo que ajuste este tipo de variables según 
+una probabilidad de pertenecer o no a la categoría es lo más adecuado, por lo que se optó por un modelo de regresión logística bayesiana 
+
+\begin{equation}
+    \text{logit}\big(P(Y_i = 1 \mid \mathbf{x}_i)\big) 
+    = \log\left(\frac{p_i}{1 - p_i}\right) 
+    = \beta_0 + \sum_{j=1}^{k} \beta_j \, x_{ij}
+    \label{eq:logit}
+\end{equation}
+
+donde $Y_i \sim \text{Bernoulli}(p_i)$ representa si el atleta $i$ es elite, $\mathbf{x}_i$ es el vector de predictores, $\beta_0$ es el 
+intercepto y $\beta_1, \dots, \beta_k$ son los coeficientes asociados a cada predictor, esto se define igual en todos los modelo modelados 
+\texttt{family = binomial(link = "logit")}, se opto por la familia binomial ya que cada fila del dataset representa a un solo atleta donde 
+$Bin(n=1, p_i)$ es equivalente a $Bernoulli(p_i)$. 
+
+
+Al estra utilizando un enfoque bayesiano tenemos la posbilidad de eligir las distribuciones \textit{prior}, lo que permite incorporar información 
+previa que ayuda a regularizar las estimaciones de los coeficientes y cuantificar la incertidumbre de forma directa mediante intervalos creíbles 
+y probabilidades como $P(\beta_j > 0)$. En este caso, se optó por las siguientes distribuciones \textit{prior} 
+
+Para los \textbf{coeficientes} $\beta_1, \dots, \beta_k$ se especificó:
+\begin{equation}
+    \beta_j \sim \mathcal{N}(0, \, 2{.}5^2), \quad \text{con } \texttt{autoscale = TRUE}
+    \label{eq:prior_coef}
+\end{equation}
+
+los valores de la normal fuerón elegidos segun recomineda la literatura para modelos de regresión logística bayesiana. 
+
+EXPLICAR ESTO UN POCO MEJOR :)
+
+Para el \textbf{intercepto} $\beta_0$ se utilizó una \textit{prior} más amplia:
+\begin{equation}
+    \beta_0 \sim \mathcal{N}(0, \, 5^2), \quad \text{con } \texttt{autoscale = TRUE}
+    \label{eq:prior_int}
+\end{equation}
+ESTO IGUAL, PQ SE ELIGIO ESTA DISTRIB PARA LOS INTERCEPTOS
+
+Con lo anterior definido se procedío a estimar diferentes modelos con distrintos predictores cada uno
+
+
+\begin{itemize}
+    \item Modelo 1: Elite $\sim$ 
+    \item Modelo 2: Elite $\sim$
+    \item Modelo 3: Elite $\sim$
+    \item Modelo 4: Elite $\sim$
+    \item Modelo 5: Elite $\sim$
+    \item Modelo 6: Elite $\sim$
+\end{itemize}
 
 \subsection{Modelo Final}
 
@@ -158,6 +208,9 @@ Year\_std & Año de la competencia estandarizado (Z-score) para el modelamiento 
 BayesianN. 2023, ``Modeling Car Insurance Claim using Bayesian Logistic : Part 1'', RPubs. Disponible en: \texttt{https://rpubs.com/BayesianN/claims}
 
 A Short Intro to Bayesian Logistic Regression \texttt{https://medium.com/@wtc2189/day-6-a-short-intro-to-bayesian-logistic-regression-6141c1d1d6c9}
+
+\texttt{https://discourse.mc-stan.org/t/the-prior-in-logistic-model/41077}
+
 % Formato: Apellido, Iniciales. Año, Revista, volumen, página.
 % Ejemplo: Aguirre, J. E., Ginsburg, A. G., Dunham, M. K., et al. 2011, ApJS, 192, 4
 
