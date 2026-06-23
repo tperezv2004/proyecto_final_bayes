@@ -68,11 +68,23 @@ FALTA EXPLICAR COMO SE ELIGIO EL MODELO FINAL, SOLO MENCIONAR LAS TECNICAS UTILI
 
 \section*{Análisis}
 
+
+AGREGAR EVENT, SI UNA PEROSNA SOLO SE DEDICA A UNA MODELAIDAD PUEDE LLEGAR A AFECTAR 
+ENDOGENIEDAD 
+
 \subsection*{Descripción de variables y datos}
 
 Los datos utilizados para estimar los modelos provienen de \textbf{OpenPowerlifting}, una base abierta que recopila resultados de competencias de powerlifting a nivel internacional. 
 La base original contiene 3.920.662 registros y 42 variables, pero para este análisis fuerón selccionadas $\sim 16$ variables que están señaladas mas adelante, es importante señalar 
 que las filas no son completamente independientes, ya que un mismo atleta puede aparecer varias veces si compitió en más de una ocasión.
+- SBD: Squat-Bench-Deadlift, also commonly called "Full Power".
+- BD: Bench-Deadlift, also commonly called "Ironman" or "Push-Pull".
+- SD: Squat-Deadlift, very uncommon.
+- SB: Squat-Bench, very uncommon.
+- S: Squat-only.
+- B: Bench-only.
+- D: Deadlift-only.
+
 
 
 La preparación y tratamiento de los datos estan detallas de mejor manera en el informe anterior, pero a modo de resumen, antes de modelar 
@@ -88,7 +100,9 @@ los datos se descartaron variables que no eran relevantes y se crearon nuevas va
 \end{itemize}
 
 Se eliminaron observaciones con valores faltantes en variables utilizadas para modelar y se restringierón valores atípicos en edades, pesos corporales, etc. Quedando con las suguientes 
-variables para el análisis
+variables para el análisis. 
+
+\newpage
 
 % Hay que expliacr pq la desicion de X puntaje para elite, que se estandarizaron algunas columans 
 % que se eliminaron otras y que se crearon otras a partir de las originales, como el año de la competencia a partir de la fecha, etc. 
@@ -128,7 +142,6 @@ Elite & Variable binaria creada para clasificar atletas como Elite (1) si sus pu
 Elite\_texto & Etiqueta en formato texto de la clasificación Elite (``Elite'' o ``No elite''). & Cualitativa & No aplica \\
 Equipo & Variable creada para agrupar las categorías de equipamiento en ``Raw'' y ``Equipado''. & Cualitativa & No aplica \\
 Tested\_bin & Variable binaria que indica si el atleta fue sometido a control antidopaje (1 = Yes) o no (0 = No/NA). & Cualitativa & Binaria (1/0) \\
-Sexo & Variable equivalente a Sex, adaptada al español. & Cualitativa & No aplica \\
 Year & Año de la competencia, extraído a partir de Date. & Cuantitativa discreta & Año \\
 Age\_std & Edad del atleta estandarizada (Z-score) para el modelamiento bayesiano. & Cuantitativa continua & Desviaciones estándar \\
 Bw\_std & Peso corporal del atleta estandarizado (Z-score) para el modelamiento bayesiano. & Cuantitativa continua & Desviaciones estándar \\
@@ -136,7 +149,13 @@ Year\_std & Año de la competencia estandarizado (Z-score) para el modelamiento 
 
 \end{longtable}
 
-\subsection{Análisis preliminar} (aqui yo pondria los graficos antes del modelar) 
+\newpage
+
+\subsection* {Análisis preliminar} (aqui yo pondria los graficos antes del modelar) 
+¿Afecta el peso?
+¿Afecta el sexo?, el dopaje, edad  
+
+
 % Otro bloque de resultados
 
 \subsection*{Modelo preliminar}
@@ -182,13 +201,16 @@ Con lo anterior definido se procedío a estimar diferentes modelos con distrinto
 
 
 \begin{itemize}
-    \item Modelo 1: Elite $\sim$ 
-    \item Modelo 2: Elite $\sim$
-    \item Modelo 3: Elite $\sim$
-    \item Modelo 4: Elite $\sim$
-    \item Modelo 5: Elite $\sim$
-    \item Modelo 6: Elite $\sim$
+    \item Modelo Base : Elite $\sim Age_{std} + Age_{std}^2 + Bw_{std} + Sex + Equipo + Tested\_bin + Year_{std}$
+    \item Modelo 0: Elite $\sim 1$
+    \item Modelo 1: Elite $\sim Age_{std} + Age_{std}^2 + Bw_{std}$
+    \item Modelo 2: Elite $\sim Age_{std} + Age_{std}^2 + Bw_{std} + Sex + Equipo$
+    \item Modelo 3: Elite $\sim Age_{std} + Age_{std}^2 + Bw_{std} + Sex + Equipo + Tested\_bin + Year_{std}$
+    \item Modelo 4: Elite $\sim Age_{std} + Age_{std}^2 + Bw_{std} + Sex * Equipo + Tested\_bin + Year_{std}$
+    \item Modelo 5: Elite $\sim Age_{std} + Age_{std}^2 + Sex$
 \end{itemize}
+
+\subsubsection*{Comparación de Modelos}
 
 \subsection{Modelo Final}
 
@@ -210,6 +232,9 @@ BayesianN. 2023, ``Modeling Car Insurance Claim using Bayesian Logistic : Part 1
 A Short Intro to Bayesian Logistic Regression \texttt{https://medium.com/@wtc2189/day-6-a-short-intro-to-bayesian-logistic-regression-6141c1d1d6c9}
 
 \texttt{https://discourse.mc-stan.org/t/the-prior-in-logistic-model/41077}
+
+
+\texttt{https://medium.com/@wtc2189/day-6-a-short-intro-to-bayesian-logistic-regression-6141c1d1d6c9}
 
 % Formato: Apellido, Iniciales. Año, Revista, volumen, página.
 % Ejemplo: Aguirre, J. E., Ginsburg, A. G., Dunham, M. K., et al. 2011, ApJS, 192, 4

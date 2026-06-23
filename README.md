@@ -104,4 +104,30 @@ se crea un nuevo archivo llamado `Data/modelos_finales.csv`, no se esta usando e
 
 4. Analisas graficos y resultados
 
+5. TODO (PRINCIPAL A REALIZAR)
+
+    5.1 Categorizar (separar) bien por categoria, evento, competidor etc 
+    
+    5.2 Hacer los diagnosticos antes de realizar el modelo final 
+        Normalidad -> Ks con corrección de Lilliefortds
+        Jarque-Bera
+        Breush pagan -> heterocedasticidad
+        White -> ruido blaco
+        box-cox 
+
+        grafico de residuos t ajustados 
+        Distancia de Coook
+        Residuos -> tal vez no funcione?
+        Leverage
+        Covratio
+        DFBEtas 
+        DFFitts
+        residuos estudantizados
+
+    5.3 Realizar test 
+        test de wald
+        test de box tidwell
+        GVIF (VIF generalizado  <1.14)
+
+
 
