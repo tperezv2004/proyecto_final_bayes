@@ -23,6 +23,8 @@ df_trabajo <- read_csv(ruta_datos)
 # --------------------------------------------------------
 # Prep Datos Finales
 # --------------------------------------------------------
+df_trabajo%>%
+  count(Event, sort = TRUE)
 
 umbral_elite <- quantile(df_trabajo$Dots, 0.95, na.rm = TRUE)
 df_modelos_finales <- df_trabajo %>%
@@ -32,7 +34,7 @@ df_modelos_finales <- df_trabajo %>%
     Bench1Kg, Bench2Kg, Bench3Kg, Bench4Kg, Deadlift1Kg, Deadlift2Kg,
     Deadlift4Kg, Best3SquatKg, Best3BenchKg, Place, ParentFederation,
     MeetCountry, MeetState, MeetName, WeightClassKg, State, Deadlift3Kg,
-    Division, Goodlift, Best3DeadliftKg, Wilks, Country, Federation, Event
+    Division, Goodlift, Best3DeadliftKg, Wilks, Country, Federation, Sanctioned
   )) %>%
   mutate(
     Date = as.Date(Date),
@@ -41,6 +43,8 @@ df_modelos_finales <- df_trabajo %>%
     
     Elite = if_else(Dots >= umbral_elite, 1L, 0L),
     Elite_texto = if_else(Elite == 1, "Elite", "No elite"),
+    
+    Event = factor(Event, levels = c("SBD", "S", "BD", "D")),
     
     Equipo = case_when(
       Equipment == "Raw" ~ "Raw",
@@ -87,26 +91,53 @@ df_modelos_finales %>%
     porcentaje_elite = mean(Elite) * 100
   )
 
-
-n_muestra_modelo <- min(10000, nrow(df_modelos_finales))
+#contar datos de event por categroria
+df_modelos_finales %>%
+  count(Event, sort = TRUE)
+df_modelos_finales %>%
+  count(Sexo, sort = TRUE)
+df_modelos_finales %>%
+  count(Equipo, sort = TRUE)
+df_modelos_finales %>%
+  count(Tested, sort = TRUE)
 df_modelos_finales <- df_modelos_finales %>%
-  slice_sample(n = n_muestra_modelo) %>%
+  filter(!is.na(Event))
+
+# muestreo estratificado para balancear clases 
+# 5000 Elite y 5000 No Elite, para evitar sesgos de categorias muy pequeñas
+
+# Hay que escribir en el informe que se hizo este submuestreo estratificado para balancear 
+# clases, y que se hizo para evitar sesgos de categorias muy pequeñas, ya que elite era solo el 
+# 5% 
+
+df_modelos_finales <- df_modelos_finales %>%
+  group_by(Elite) %>%
+  slice_sample(n = 5000) %>% 
+  ungroup() %>%
+  sample_frac(1) %>%
   mutate(
     Age_std = as.numeric(scale(Age)),
     Bw_std = as.numeric(scale(BodyweightKg)),
     Year_std = as.numeric(scale(Year))
   )
 
+
+#contar datos de event por categroria
+df_modelos_finales %>%
+  count(Event, sort = TRUE)
+df_modelos_finales %>%
+  count(Sexo, sort = TRUE)
+df_modelos_finales %>%
+  count(Equipo, sort = TRUE)
+df_modelos_finales %>%
+  count(Tested, sort = TRUE)
+
+
 dim(df_modelos_finales)
-
-df_modelos_finales %>%
-  count(Elite_texto)
-
-df_modelos_finales %>%
-  count(Sex, Equipo)
-
 head(df_modelos_finales)
 names(df_modelos_finales)
+str(df_modelos_finales)
+
 
 
 # guardar df_modelos_finales para usarlo en los scripts de modelos
