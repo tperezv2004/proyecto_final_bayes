@@ -129,5 +129,7 @@ se crea un nuevo archivo llamado `Data/modelos_finales.csv`, no se esta usando e
         test de box tidwell
         GVIF (VIF generalizado  <1.14)
 
+   5.4 valor-p
+
 
 
