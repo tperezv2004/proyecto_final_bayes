@@ -65,6 +65,8 @@ prior_intercepto <- normal(
 # 4. AJUSTAR MODELO FINAL BAYESIANO
 # --------------------------------------------------------
 # --------------------------------------------------------
+
+# Cambiar formula_final 
 formula_final <- Elite ~  Age_std + I(Age_std^2) + Sex + Equipo + Tested_bin + Year_std + Sex:Equipo
 
 modelo_final <- stan_glm(

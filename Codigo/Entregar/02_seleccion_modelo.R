@@ -279,3 +279,7 @@ modelo_final <- modelos[[nombre_modelo_final]]
 
 summary(modelo_final)
 formula(modelo_final)
+
+
+# Tomar los 2 mejores modelos y aplicar BF
+
