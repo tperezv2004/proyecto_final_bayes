@@ -98,38 +98,10 @@ se crea un nuevo archivo llamado `Data/modelos_finales.csv`, no se esta usando e
 ## Falta 
 1. Agregar BF, ya que solo tenemos LOO y la profe dijo que debiamos agregarlo (intrepretar y "comparar" ambos)
 
-2. Revisar ortografí y code 
+2. Revisar ortografía y code 
 
-3. Organizar code 
+3. Analisas graficos y resultados
 
-4. Analisas graficos y resultados
+4. Hacer predicciones con el modelo (ejemplo: edad -> + probabilidad de ser ELITE)
 
-5. TODO (PRINCIPAL A REALIZAR)
-
-    5.1 Categorizar (separar) bien por categoria, evento, competidor etc 
-    
-    5.2 Hacer los diagnosticos antes de realizar el modelo final 
-        Normalidad -> Ks con corrección de Lilliefortds
-        Jarque-Bera
-        Breush pagan -> heterocedasticidad
-        White -> ruido blaco
-        box-cox 
-
-        grafico de residuos t ajustados 
-        Distancia de Coook
-        Residuos -> tal vez no funcione?
-        Leverage
-        Covratio
-        DFBEtas 
-        DFFitts
-        residuos estudantizados
-
-    5.3 Realizar test 
-        test de wald
-        test de box tidwell
-        GVIF (VIF generalizado  <1.14)
-
-   5.4 valor-p
-
-
-
+5. Terminar Informe

@@ -2,7 +2,10 @@
 # DIAGNOSTICO DEL MODELO FINAL
 
 # Modelo final:
-# Elite ~ Age_std + I(Age_std^2) + Sex + Equipo + Tested_bin + Year_std + Sex:Equipo
+# MEJOR: (modelo6 stepward) Elite ~ Age_std + I(Age_std^2) + Sex + Equipo + Tested_bin + Year_std + Sex:Equipo
+
+# SEGUNDO MEJOR: (modelo 4)
+# Elite ~ Age_std + I(Age_std^2) + Bw_std + Sex * Equipo + Tested_bin + Year_std
 
 # --------------------------------------------------------
 # --------------------------------------------------------
