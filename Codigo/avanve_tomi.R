@@ -436,6 +436,13 @@ prior_intercepto <- normal(
 # 11. MODELOS BAYESIANOS LOGISTICOS
 # --------------------------------------------------------
 # --------------------------------------------------------
+# test de wald
+# test de box tidwell
+# GVIF (VIF generalizado  <1.14)
+# Modelo base:
+# Toda las variables: 
+
+
 
 # Modelo nulo:
 # No usa caracteristicas del atleta.
@@ -499,7 +506,7 @@ modelo_3 <- stan_glm(
   refresh = 0
 )
 
-
+head(df_trabajo)
 # Modelo 4:
 # Modelo con interaccion entre sexo y tipo de equipo.
 
@@ -515,6 +522,41 @@ modelo_4 <- stan_glm(
   refresh = 0
 )
 
+# Modelo 5:
+# Variables edad + edad*2 + sexo 
+
+modelo_5 <- stan_glm(
+  Elite ~ Age_std + I(Age_std^2) + Sex,
+  data = df_modelo,
+  family = binomial(link = "logit"),
+  prior = prior_coeficientes,
+  prior_intercept = prior_intercepto,
+  seed = 123,
+  chains = 4,
+  iter = 2000,
+  refresh = 0
+)
+# --------------------------------------------------------
+# --------------------------------------------------------
+# 11.5. Ver si son buenos modelos
+# --------------------------------------------------------
+# --------------------------------------------------------
+
+# Normalidad -> Ks con corrección de Lilliefortds
+# Jarque-Bera
+# Breush pagan -> heterocedasticidad
+# White -> ruido blaco
+# box-cox 
+
+#grafico de residuos t ajustados 
+# Distancia de Coook
+# Residuos -> tal vez no funcione?
+# Leverage
+# Covratio
+# DFBEtas 
+# DFFitts
+# residuos estudantizados
+#
 
 # --------------------------------------------------------
 # --------------------------------------------------------
@@ -527,7 +569,7 @@ summary(modelo_1)
 summary(modelo_2)
 summary(modelo_3)
 summary(modelo_4)
-
+summary(modelo_5)
 
 # --------------------------------------------------------
 # --------------------------------------------------------
@@ -538,18 +580,31 @@ summary(modelo_4)
 # LOO permite comparar modelos segun capacidad predictiva.
 # El mejor modelo aparece primero en loo_compare.
 
+# --------------------------------------------------------
+# --------------------------------------------------------
+# 9. COMPARACION DE MODELOS CON LOO
+# --------------------------------------------------------
+# --------------------------------------------------------
+
+# LOO compara los modelos segun capacidad predictiva.
+# El mejor modelo aparece primero en loo_compare.
+
 loo_0 <- loo(modelo_0)
 loo_1 <- loo(modelo_1)
 loo_2 <- loo(modelo_2)
 loo_3 <- loo(modelo_3)
 loo_4 <- loo(modelo_4)
+loo_5 <- loo(modelo_5)
+loo_6_step <- loo(modelo_6_step)
 
 comparacion_loo <- loo_compare(
   loo_0,
   loo_1,
   loo_2,
   loo_3,
-  loo_4
+  loo_4,
+  loo_5,
+  loo_6_step
 )
 
 comparacion_loo
@@ -821,11 +876,60 @@ plot(modelo_final, "acf_bar")
 # 21. CURVA ROC Y AUC
 # --------------------------------------------------------
 # --------------------------------------------------------
+# --------------------------------------------------------
+# --------------------------------------------------------
+# 21. CURVA ROC Y AUC POSTERIOR
+# --------------------------------------------------------
+# --------------------------------------------------------
+
+# Predicciones posteriores para cada observacion.
+# Filas = muestras posteriores
+# Columnas = observaciones
 
 pred_post_obs <- posterior_epred(
   modelo_final,
   newdata = df_modelo
 )
+
+# Para que el calculo no sea tan pesado, usamos algunas muestras posteriores.
+
+set.seed(123)
+
+n_draws_auc <- min(300, nrow(pred_post_obs))
+
+draws_auc <- sample(
+  1:nrow(pred_post_obs),
+  size = n_draws_auc
+)
+
+# Calcular un AUC para cada muestra posterior.
+# Esto genera una distribucion posterior del AUC.
+
+auc_posterior <- map_dbl(draws_auc, function(i) {
+  roc_i <- roc(
+    response = df_modelo$Elite,
+    predictor = pred_post_obs[i, ],
+    levels = c(0, 1),
+    direction = "<",
+    quiet = TRUE
+  )
+  
+  as.numeric(auc(roc_i))
+})
+
+# Resumen bayesiano del AUC
+
+resumen_auc <- tibble(
+  Media = mean(auc_posterior),
+  Mediana = median(auc_posterior),
+  Q025 = quantile(auc_posterior, 0.025),
+  Q975 = quantile(auc_posterior, 0.975)
+)
+
+resumen_auc
+
+
+# Para graficar una sola curva ROC usamos la probabilidad posterior media.
 
 df_modelo_roc <- df_modelo %>%
   mutate(
@@ -836,12 +940,13 @@ roc_modelo <- roc(
   response = df_modelo_roc$Elite,
   predictor = df_modelo_roc$Prob_Elite,
   levels = c(0, 1),
-  direction = "<"
+  direction = "<",
+  quiet = TRUE
 )
 
-auc_modelo <- auc(roc_modelo)
-
-auc_modelo
+auc_media <- mean(auc_posterior)
+auc_q025 <- quantile(auc_posterior, 0.025)
+auc_q975 <- quantile(auc_posterior, 0.975)
 
 grafico_roc <- ggroc(roc_modelo) +
   geom_abline(
@@ -851,7 +956,11 @@ grafico_roc <- ggroc(roc_modelo) +
   ) +
   labs(
     title = "Curva ROC del modelo final",
-    subtitle = paste("AUC =", round(auc_modelo, 3)),
+    subtitle = paste0(
+      "AUC posterior medio = ", round(auc_media, 3),
+      " | IC 95%: [", round(auc_q025, 3), ", ",
+      round(auc_q975, 3), "]"
+    ),
     x = "Especificidad",
     y = "Sensibilidad"
   ) +
