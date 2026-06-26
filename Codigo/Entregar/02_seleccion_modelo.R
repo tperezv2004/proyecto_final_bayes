@@ -8,9 +8,10 @@
 # --------------------------------------------------------
 
 set.seed(123)
-
+install.packages("bridgesampling")
 library(tidyverse)
 library(rstanarm)
+library(bridgesampling)
 library(loo)
 
 options(mc.cores = parallel::detectCores())
@@ -272,7 +273,7 @@ comparacion_loo
 
 # El mejor modelo es el que aparece primero en la comparacion LOO
 
-nombre_modelo_final <- rownames(comparacion_loo)[1]
+nombre_modelo_final <- rownames(comparacion_loo)[rownames(comparacion_loo) != "modelo_6_step"][1] #omitimos el modelo_6_step
 nombre_modelo_final
 
 modelo_final <- modelos[[nombre_modelo_final]]
@@ -281,5 +282,63 @@ summary(modelo_final)
 formula(modelo_final)
 
 
-# Tomar los 2 mejores modelos y aplicar BF
+# --------------------------------------------------------
+# --------------------------------------------------------
+# 11. FACTOR DE BAYES: modelo_6_step vs modelo_final
+# --------------------------------------------------------
+# --------------------------------------------------------
 
+# Carpeta temporal para los archivos de diagnostico
+dir_diag <- file.path(tempdir(), "diagnostics")
+dir.create(dir_diag, showWarnings = FALSE)
+
+
+# Se debieron reentrenar los modelos para incluir archivos de diagnóstico de Stan,
+# ya que stan_glm() no los guarda por defecto. Esto es necesario para poder usar
+# bridge_sampler() correctamente en el cálculo del Factor de Bayes.
+modelo_6_step_bf <- stan_glm(
+  formula        = formula_step,
+  data           = df_modelo,
+  family         = binomial(link = "logit"),
+  prior          = prior_coeficientes,
+  prior_intercept = prior_intercepto,
+  seed           = 123,
+  chains         = 4,
+  iter           = 2000,
+  refresh        = 0,
+  control        = list(adapt_delta = 0.95),
+  diagnostic_file = file.path(dir_diag, "modelo_6_step_%i.csv")
+)
+
+modelo_final_bf <- stan_glm(
+  formula        = formula(modelo_final),
+  data           = df_modelo,
+  family         = binomial(link = "logit"),
+  prior          = prior_coeficientes,
+  prior_intercept = prior_intercepto,
+  seed           = 123,
+  chains         = 4,
+  iter           = 2000,
+  refresh        = 0,
+  control        = list(adapt_delta = 0.95),
+  diagnostic_file = file.path(dir_diag, "modelo_final_%i.csv")
+)
+
+# Verosimilitud marginal de cada modelo
+marginal_modelo_6_step <- bridge_sampler(modelo_6_step_bf, silent = TRUE)
+marginal_modelo_final  <- bridge_sampler(modelo_final_bf,  silent = TRUE)
+
+# Resumen de cada estimacion (incluye error de aproximacion)
+summary(marginal_modelo_6_step)
+summary(marginal_modelo_final)
+
+# Factor de Bayes
+BF_final_vs_step <- bayes_factor(
+  x1 = marginal_modelo_final,
+  x2 = marginal_modelo_6_step
+)
+
+BF_final_vs_step
+
+# Comparar con escala de Jeffreys / Kass & Raftery
+log10(BF_final_vs_step$bf)
