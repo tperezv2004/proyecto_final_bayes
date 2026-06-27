@@ -76,8 +76,8 @@ df_trabajo %>%
 # para alcanzar el nivel de elite en USA?
 
 # La variable respuesta sera binaria: # podemos jugar con esto 
-# Elite = 1 si Dots >= P_80
-# Elite = 0 si Dots < P_80
+# Elite = 1 si Dots >= P_95
+# Elite = 0 si Dots < P_95
 
 # Importante:
 # Dots NO se usa como predictor, porque Elite se construye desde Dots
@@ -123,8 +123,10 @@ df_modelo_pre <- df_trabajo %>%
     Dots > 10
   )
 
+#Vamos a intentar probar con 95% y 80%
+percentil_elite = 0.95
 # Ahora el umbral se calcula sobre la base final filtrada
-umbral_elite <- quantile(df_modelo_pre$Dots, 0.80, na.rm = TRUE)
+umbral_elite <- quantile(df_modelo_pre$Dots, percentil_elite, na.rm = TRUE)
 
 df_modelo_pre <- df_modelo_pre %>%
   mutate(

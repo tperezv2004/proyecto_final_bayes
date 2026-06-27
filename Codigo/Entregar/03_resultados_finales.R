@@ -68,7 +68,6 @@ prior_intercepto <- normal(
 
 # Cambiar formula_final 
 formula_final <- Elite ~  Age_std + I(Age_std^2) + Sex + Equipo + Tested_bin + Year_std + Sex:Equipo
-
 modelo_final <- stan_glm(
   formula = formula_final,
   data = df_modelo,
@@ -135,11 +134,11 @@ mcmc_areas(
     "Year_std",
     "SexF:EquipoEquipado"
   ),
-  prob = 0.90
+  prob = 0.95
 ) +
   labs(
     title = "Distribuciones posteriores de los coeficientes",
-    subtitle = "Intervalos posteriores al 90%",
+    subtitle = "Intervalos posteriores al 95%",
     x = "Valor del coeficiente",
     y = "Parametro"
   ) +
@@ -181,7 +180,7 @@ mcmc_trace(
 # --------------------------------------------------------
 
 # Compara datos observados con datos simulados desde el modelo.
-
+# Cambiar color Y diferentes
 pp_check(modelo_final, type = "bars", ndraws = 100) +
   labs(
     title = "Posterior predictive check del modelo final"
@@ -210,24 +209,22 @@ df_modelo <- df_modelo %>% mutate(prob_predicha = prob_media)
 
 # tal vez borrar porque no es mucho
 
-roc_modelo <- roc(
-  response = df_modelo$Elite,
-  predictor = df_modelo$prob_predicha,
-  levels = c(0, 1),
-  direction = "<",
-  quiet = TRUE
-)
-
-auc_modelo <- auc(roc_modelo)
-auc_modelo
-
-plot(
-  roc_modelo,
-  main = paste("Curva ROC del modelo final - AUC =", round(auc_modelo, 3)) )
-
-
-# --------------------------------------------------------
-# --------------------------------------------------------
+#roc_modelo <- roc(
+#  response = df_modelo$Elite,
+#  predictor = df_modelo$prob_predicha,
+#  levels = c(0, 1),
+#  direction = "<",
+#  quiet = TRUE
+#)
+#
+#auc_modelo <- auc(roc_modelo)
+#auc_modelo
+#
+#plot(
+#  roc_modelo,
+#  main = paste("Curva ROC del modelo final - AUC =", round(auc_modelo, 3)) )
+## --------------------------------------------------------
+## --------------------------------------------------------
 # 12. GRAFICO: PROBABILIDAD PREDICHA SEGUN EDAD
 # --------------------------------------------------------
 # --------------------------------------------------------
@@ -275,42 +272,10 @@ grafico_prob_year <- ggplot(
 grafico_prob_year
 
 
-# --------------------------------------------------------
-# --------------------------------------------------------
-# 14. GRAFICO: PROBABILIDAD PREDICHA POR GRUPO
-# --------------------------------------------------------
-# --------------------------------------------------------
-
-tabla_prob_grupo_plot <- tabla_prob_grupo %>%
-  mutate(
-    Control_Dopaje = if_else(
-      Tested_bin == 1,
-      "Con testeo antidopaje",
-      "Sin testeo o no reportado"
-    ),
-    Sexo_Label = if_else(Sex == "M", "Hombres", "Mujeres")
-  )
-
-grafico_prob_grupo <- ggplot(
-  tabla_prob_grupo_plot,
-  aes(x = Equipo, y = prob_promedio, fill = Control_Dopaje)
-) +
-  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
-  facet_wrap(~ Sexo_Label) +
-  labs(
-    title = "Probabilidad promedio predicha de ser Elite",
-    subtitle = "Comparacion por sexo, equipamiento y testeo",
-    x = "Tipo de equipamiento",
-    y = "Probabilidad promedio predicha",
-    fill = "Control antidopaje"
-  ) +
-  theme_minimal()
-
-grafico_prob_grupo
 
 # --------------------------------------------------------
 # --------------------------------------------------------
-# 15. MODELO GLM AUXILIAR PARA DIAGNOSTICOS CLASICOS
+# 14. MODELO GLM AUXILIAR PARA DIAGNOSTICOS CLASICOS
 # --------------------------------------------------------
 # --------------------------------------------------------
 
@@ -328,7 +293,7 @@ summary(modelo_glm_diag)
 
 # --------------------------------------------------------
 # --------------------------------------------------------
-# 16. VALOR-P Y TEST DE WALD
+# 15. VALOR-P Y TEST DE WALD
 # --------------------------------------------------------
 # --------------------------------------------------------
 
@@ -354,7 +319,7 @@ test_wald_global
 
 # --------------------------------------------------------
 # --------------------------------------------------------
-# 17. GVIF / VIF
+# 16. GVIF / VIF
 # --------------------------------------------------------
 # --------------------------------------------------------
 
@@ -604,7 +569,7 @@ abline(
 
 resumen_final_diagnostico <- tibble(
   Medida = c(
-    "AUC",
+    #"AUC",
     "N observaciones",
     "N parametros",
     "Observaciones con residuo studentizado alto",
@@ -613,7 +578,7 @@ resumen_final_diagnostico <- tibble(
     "Observaciones influyentes totales"
   ),
   Valor = c(
-    as.numeric(auc_modelo),
+    #as.numeric(auc_modelo),
     n,
     p,
     resumen_flags$residuos_student_altos,

@@ -135,7 +135,7 @@ grafico_elite_edad <- ggplot(
   ) +
   labs(
     title = "Porcentaje de atletas Elite por edad y sexo",
-    subtitle = "Clasificación Elite definida como el 20% superior de DOTS",
+    subtitle = "Clasificación Elite definida como el 5% superior de DOTS",
     x = "Rango de edad",
     y = "Porcentaje Elite"
   ) +
@@ -186,7 +186,7 @@ grafico_elite_edad_2 <- ggplot(
   ) +
   labs(
     title = "Porcentaje de atletas Elite por edad",
-    subtitle = "Elite = 20% superior en DOTS | Sexo como predictor en el modelo",
+    subtitle = "Elite = 5% superior en DOTS | Sexo como predictor en el modelo",
     x = "Rango de edad",
     y = "Porcentaje Elite"
   ) +
