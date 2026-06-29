@@ -2,7 +2,7 @@
 # DIAGNOSTICO DEL MODELO FINAL
 
 # Modelo final:
-# MEJOR: (modelo6 stepward) Elite ~ Age_std + I(Age_std^2) + Sex + Equipo + Tested_bin + Year_std + Sex:Equipo
+# MEJOR: (modelo6 stepward) Elite ~ Age_std + I(Age_std^2) + Bw_std + Sex + Equipo + Tested_bin + Sex:Equipo
 
 # SEGUNDO MEJOR: (modelo 4)
 # Elite ~ Age_std + I(Age_std^2) + Bw_std + Sex * Equipo + Tested_bin + Year_std
@@ -66,8 +66,8 @@ prior_intercepto <- normal(
 # --------------------------------------------------------
 # --------------------------------------------------------
 
-# Cambiar formula_final 
-formula_final <- Elite ~  Age_std + I(Age_std^2) + Sex + Equipo + Tested_bin + Year_std + Sex:Equipo
+#Formila Final 
+formula_final <- Elite ~  Age_std + I(Age_std^2)+ Bw_std + Sex + Equipo + Tested_bin + Sex:Equipo
 modelo_final <- stan_glm(
   formula = formula_final,
   data = df_modelo,
@@ -131,7 +131,7 @@ mcmc_areas(
     "SexF",
     "EquipoEquipado",
     "Tested_bin",
-    "Year_std",
+    "Bw_std",
     "SexF:EquipoEquipado"
   ),
   prob = 0.95
@@ -163,7 +163,7 @@ mcmc_trace(
     "SexF",
     "EquipoEquipado",
     "Tested_bin",
-    "Year_std",
+    "Bw_std",
     "SexF:EquipoEquipado"
   )
 ) +
